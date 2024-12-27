@@ -8,7 +8,7 @@ const productoRoutes = require("./routes/productoRoutes"); // <-- Solicitamos la
 const categoryRoutes = require('./routes/categoryRoutes'); // Importar las rutas de categorías
 const carritoRoutes = require('./routes/carritoRoutes'); // Importar las rutas de carritos
 const carritoProductos = require('./routes/carritoProductosRoutes'); // Importar las rutas de carritoProductos
-
+const ordenesRoutes = require('./routes/ordenesRoutes'); // Importar las rutas de ordenes
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
@@ -30,6 +30,7 @@ app.use('/api/users', userRoutes); // Rutas de usuarios
 app.use('/api/categorias', categoryRoutes); // Rutas de categorias
 app.use('/api/carritos', carritoRoutes); // Rutas de carritos
 app.use('/api/carritoProductos', carritoProductos); // Rutas de carritoProductos
+app.use('/api/ordenes', ordenesRoutes); // Rutas de ordenes
 
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
