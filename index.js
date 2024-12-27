@@ -6,6 +6,8 @@ const cors = require('cors'); // ¿Qué hace CORS? Por defecto, los navegadores 
 const userRoutes = require('./routes/userRoutes');
 const productoRoutes = require("./routes/productoRoutes"); // <-- Solicitamos las rutas de productos. (para manejar las rutas de productos)
 const categoryRoutes = require('./routes/categoryRoutes'); // Importar las rutas de categorías
+const carritoRoutes = require('./routes/carritoRoutes'); // Importar las rutas de carritos
+const carritoProductos = require('./routes/carritoProductosRoutes'); // Importar las rutas de carritoProductos
 
 //Configuraciones de la variable de entorno env.
 dotenv.config();
@@ -26,6 +28,8 @@ app.use(cors()); // Habilitar CORS
 app.use('/api/productos', productoRoutes); // Rutas de productos
 app.use('/api/users', userRoutes); // Rutas de usuarios
 app.use('/api/categorias', categoryRoutes); // Rutas de categorias
+app.use('/api/carritos', carritoRoutes); // Rutas de carritos
+app.use('/api/carritoProductos', carritoProductos); // Rutas de carritoProductos
 
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
