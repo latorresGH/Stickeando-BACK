@@ -5,6 +5,7 @@ const path = require('path'); // <-- Solicitamos la dependencia path. (para mane
 const cors = require('cors'); // ¿Qué hace CORS? Por defecto, los navegadores bloquean las solicitudes de recursos entre dominios diferentes por razones de seguridad. Si tu frontend está ejecutándose en un dominio distinto al de tu backend, necesitas habilitar CORS en tu servidor para permitir que esas solicitudes entre el frontend y el backend sean procesadas correctamente.
 const userRoutes = require('./routes/userRoutes');
 const productoRoutes = require("./routes/productoRoutes"); // <-- Solicitamos las rutas de productos. (para manejar las rutas de productos)
+const categoryRoutes = require('./routes/categoryRoutes'); // Importar las rutas de categorías
 
 //Configuraciones de la variable de entorno env.
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(cors()); // Habilitar CORS
 // Rutas
 app.use('/api/productos', productoRoutes); // Rutas de productos
 app.use('/api/users', userRoutes); // Rutas de usuarios
+app.use('/api/categorias', categoryRoutes); // Rutas de categorias
 
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
