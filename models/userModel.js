@@ -35,9 +35,18 @@ const getUserByEmail = async (email) => {
 };
 //Obtener usuario por id.
 const getUserById = async (id) => {
-    const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
-    return result.rows[0]; // Retorna el usuario encontrado o undefined si no hay usuario
+    try {
+        // Consulta SQL para buscar al usuario por su ID
+        const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
+
+        // Retorna el primer usuario encontrado o null si no existe
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error('Error al obtener el usuario por ID:', error.message);
+        throw new Error('Error en la base de datos al buscar el usuario');
+    }
 };
+
 //Actualizar perfil de usuario.
 const updateUserProfile = async ({ id, nombre, password, foto }) => {
     const result = await pool.query(

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET; 
 
 const authenticate = (req, res, next) => {
-    const token = req.header('Authorization'); // El token debe estar en el encabezado 'Authorization'
+    const token = req.header('Authorization')?.split(' ')[1]; // Obtener solo el token después de 'Bearer'
 
     if (!token) {
         return res.status(401).json({ message: 'Acceso no autorizado, token requerido' });
@@ -19,5 +19,6 @@ const authenticate = (req, res, next) => {
         res.status(401).json({ message: 'Token no válido o expirado' });
     }
 };
+
 
 module.exports = authenticate;
