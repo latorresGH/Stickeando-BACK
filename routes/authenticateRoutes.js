@@ -16,7 +16,7 @@ router.get('/auth/me', authenticate, async (req, res) => {
             id: user.id,
             email: user.email,
             nombre: user.nombre,
-            foto_perfil: user.foto_perfil,
+            foto_perfil: `/api/images/profile/${user.foto_perfil}`,  // Ruta completa para acceder a la foto
             rol: user.rol,
         });
     } catch (error) {

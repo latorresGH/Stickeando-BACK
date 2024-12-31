@@ -10,6 +10,7 @@ const carritoRoutes = require('./routes/carritoRoutes'); // Importar las rutas d
 const carritoProductos = require('./routes/carritoProductosRoutes'); // Importar las rutas de carritoProductos
 const ordenesRoutes = require('./routes/ordenesRoutes'); // Importar las rutas de ordenes
 const authenticateRoutes = require('./routes/authenticateRoutes'); // Importar el middleware de autenticación
+const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las rutas de imágenes de perfil
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
@@ -33,7 +34,7 @@ app.use('/api/carritos', carritoRoutes); // Rutas de carritos
 app.use('/api/carritoProductos', carritoProductos); // Rutas de carritoProductos
 app.use('/api/ordenes', ordenesRoutes); // Rutas de ordenes
 app.use('/api', authenticateRoutes); // Rutas de autenticación
-
+app.use('/api', imgprofileRoutes); // Rutas de imágenes de perfil
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
     console.log(`El backend esta corriendo en la URL http://localhost:${PORT}`)
