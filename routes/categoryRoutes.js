@@ -9,4 +9,7 @@ router.post('/create', isAdmin, categoryController.createCategory);
 // Ruta para eliminar una categoría (solo administradores)
 router.delete('/delete/:id', isAdmin, categoryController.deleteCategory);
 
+// Ruta para obtener todas las categorías (accesible para todos)
+router.get('/all', categoryController.getCategories);
+
 module.exports = router;

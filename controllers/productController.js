@@ -80,10 +80,41 @@ const listProducts = async (req, res) => {
     }
 }
 
+const getProductsByCategoryAndSearch = async (req, res) => {
+    const { categoryId, searchQuery } = req.query;
+
+    try {
+        const products = await productModel.getProductsByCategoryAndSearch(categoryId, searchQuery);
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener productos', error: error.message });
+    }
+};
+
+const getProducts = async (req, res) => {
+    const { category, search } = req.query;
+
+    try {
+        let products;
+        if (category || search) {
+            // Si hay filtros, usa `getProductsByCategoryAndSearch`
+            products = await productModel.getProductsByCategoryAndSearch(category, search);
+        } else {
+            // Si no hay filtros, usa `getAllProducts`
+            products = await productModel.getAllProducts();
+        }
+        res.json({ products });
+    } catch (error) {
+        console.error(error); // Loguea el error para depuración
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = { 
     createProduct,
     updateProduct,
     deleteProduct,
     listProducts,
+    getProductsByCategoryAndSearch,
+    getProducts,
  }

@@ -35,7 +35,18 @@ const deleteCategory = async (req, res) => {
     }
 };
 
+const getCategories = async (req, res) => {
+    try {
+        const categories = await categoryModel.getCategories();
+        res.status(200).json(categories);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener las categorías', error: error.message });
+    }
+};
+
+
 module.exports = { 
     createCategory, 
-    deleteCategory
+    deleteCategory,
+    getCategories
 };

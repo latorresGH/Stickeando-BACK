@@ -69,6 +69,37 @@ const pool = require('../config/database/db.js'); // <- importamos la base de da
             throw new Error('Error al obtener los productos: ' + error.message);
         }
     }
+
+    const getAllProducts = async () => {
+        const query = 'SELECT * FROM productos';
+        try {
+            const result = await pool.query(query);
+            return result.rows; // Devuelve todos los productos
+        } catch (error) {
+            throw new Error('Error al obtener todos los productos: ' + error.message);
+        }
+    }
+    
+    const getProductsByCategoryAndSearch = async (categoryId, searchQuery) => {
+        const query = `
+            SELECT * FROM productos 
+            WHERE ($1::int IS NULL OR categoria_id = $1)
+            AND ($2::text IS NULL OR titulo ILIKE '%' || $2 || '%');
+        `;
+        const values = [categoryId || null, searchQuery || null];
+
+        console.log('Query:', query); // Verifica la consulta
+        console.log('Values:', values); // Verifica los valores de los parámetros
+    
+        try {
+            const result = await pool.query(query, values);
+            return result.rows;
+        } catch (error) {
+            console.error('Database query failed:', error); // Detalles del error en la consulta
+            throw new Error('Error al obtener productos con filtros: ' + error.message);
+        }
+    }
+    
     
 
 module.exports = { 
@@ -77,4 +108,6 @@ module.exports = {
     deleteProduct,
     getProductById,
     listProducts,
+    getProductsByCategoryAndSearch,
+    getAllProducts,
  }

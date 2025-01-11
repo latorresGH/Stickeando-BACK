@@ -31,7 +31,20 @@ const deleteCategory = async (id) => {
     }
 };
 
+const getCategories = async () => {
+    const query = `SELECT * FROM categorias;`;
+
+    try {
+        const result = await pool.query(query);
+        return result.rows;
+    } catch (error) {
+        throw new Error('Error al obtener las categorías: ' + error.message);
+    }
+};
+
+
 module.exports = {
     createCategory,
-    deleteCategory
+    deleteCategory,
+    getCategories 
 }
