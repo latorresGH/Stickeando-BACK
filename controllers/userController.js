@@ -54,7 +54,7 @@ const loginUser = async (req, res) => {
         }
 
          // Crear el token JWT, se genera el token con el jwt.sign utilizando el id de usuario y el correo, despues utiliza el .env con la firma para verificar el token.
-         const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_SECRET, {
+         const token = jwt.sign({ id: usuario.id, email: usuario.email, rol:usuario.rol }, process.env.JWT_SECRET, {
             expiresIn: '1h', // para que expire despues de 1 hora de sesión.
         });
         res.json({ message: 'Inicio de sesion exitoso', token });

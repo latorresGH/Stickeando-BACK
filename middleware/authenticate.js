@@ -13,6 +13,7 @@ const authenticate = (req, res, next) => {
     try {
         // Verificamos el token
         const decoded = jwt.verify(token, secretKey);
+        console.log('Decoded token:', decoded); // Agrega este registro
         req.user = decoded; // Almacenamos los datos del usuario decodificados en 'req.user'
         next(); // Si el token es válido, pasamos al siguiente middleware o controlador
     } catch (error) {

@@ -3,7 +3,7 @@ const productModel = require('../models/productModel');
 //Crear producto
 const createProduct = async (req, res) => {
     const { titulo, precio, categoria_id} = req.body;
-    const imagen_url = req.file ? `/imagenProducto/${req.file.filename}` : null;
+    const imagen_url = req.file ? `${req.file.filename}` : null;
 
     // Validar que los campos no estén vacíos
     if (!titulo || !precio || !categoria_id || !imagen_url) {

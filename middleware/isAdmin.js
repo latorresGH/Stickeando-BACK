@@ -1,6 +1,7 @@
 const isAdmin = (req, res, next) => {
     // Verificamos que el usuario tenga el rol de admin
-    if (req.user && req.user.role === 'administrador') {
+    console.log('User rol:', req.user?.rol); // Agrega este registro
+    if (req.user && req.user.rol === 'administrador') {
         return next(); // Si el rol es admin, dejamos pasar la solicitud
     }
 

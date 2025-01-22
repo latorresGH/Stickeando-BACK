@@ -12,6 +12,7 @@ const createCategory = async (req, res) => {
         const category = await categoryModel.createCategory(nombre);
         res.status(201).json({ message: 'Categoría creada con éxito', category });
     } catch (error) {
+        console.error('Error al crear la categoría:', error);  // Log adicional para depurar
         res.status(500).json({ message: 'Error al crear la categoría', error: error.message });
     }
 };

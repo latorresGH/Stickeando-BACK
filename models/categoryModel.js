@@ -1,16 +1,16 @@
 const pool = require('../config/database/db.js'); // <- importamos la base de datos a 'pool' que es la que usaremos para trabajar con la bdd.
 
 // Crear una categoría
-const createCategory = () => {
-    const query = ` INSERT INTO categorias (nombre) VALUES $1 RETURNING *; `; // <- Creamos la query que insertará una nueva categoría en la bdd.
+const createCategory = async (nombre) => { // Asegúrate de que la función sea async
+    const query = `INSERT INTO categorias (nombre) VALUES ($1) RETURNING *;`; // <- Consulta SQL para insertar la categoría
 
-    const values = ['nombre']; // <- Creamos un array con los valores que se insertarán en la bdd.
+    const values = [nombre]; // <- Pasamos la variable nombre al array de valores
 
     try {
-        const result = await.pool.query(query, values); // <- Ejecutamos la query y guardamos el resultado en 'result'.
-        return result.rows[0]; // <- Retornamos la primera fila del resultado.
+        const result = await pool.query(query, values); // <- Usamos await para esperar el resultado de la query
+        return result.rows[0]; // <- Retornamos la categoría insertada
     } catch (error) {
-        throw new Error('Error al crear la categoria: ' + error.message); // <- Si hay un error, lo lanzamos.
+        throw new Error('Error al crear la categoria: ' + error.message); // <- Si ocurre un error, lo lanzamos
     }
 };
 
