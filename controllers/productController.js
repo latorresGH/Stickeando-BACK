@@ -110,6 +110,19 @@ const getProducts = async (req, res) => {
     }
 };
 
+const getProductController = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const producto = await productModel.getProductById(id);
+        if (!producto) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+        res.json(producto);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = { 
     createProduct,
     updateProduct,
@@ -117,4 +130,5 @@ module.exports = {
     listProducts,
     getProductsByCategoryAndSearch,
     getProducts,
+    getProductController
  }

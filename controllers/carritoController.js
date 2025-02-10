@@ -1,50 +1,63 @@
 const carritoModel = require('../models/carritoModel');
+const carritoProductosModel = require('../models/carritoProductosModel');
 
-const createCarrito = async (req, res) => {
-    const { usuario_id } = req.body;
-
+// Crear carrito (Solo se usa cuando se registra un usuario)
+const createCarrito = async (usuario_id) => {
     try {
         const carrito = await carritoModel.createCarrito(usuario_id);
-        res.status(201).json({
-            message: "Carrito creado exitosamente",
-            carrito
-        });
+        return carrito;
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({
-            message: "Error al crear el carrito",
-            error: error.message
-        });
+        console.error("Error al crear el carrito:", error.message);
+        throw new Error("Error al crear el carrito");
     }
 };
 
-const getCarritoById = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const carrito = await carritoModel.getCarritoById(id);
-        if (!carrito) {
-            return res.status(404).json({ message: 'Carrito no encontrado' });
-        }
-        res.json(carrito);
-    } catch (error) {
-        res.status(500).json({ message: 'Error al obtener el carrito', error: error.message });
+// carritoController.js
+const getCarrito = async (req, res) => {
+  const { usuario_id } = req.params; // Obtener el usuario_id de los parámetros de la URL
+  
+  try {
+    // Verificamos que el usuario_id esté presente
+    if (!usuario_id) {
+      return res.status(400).json({ message: "Falta el usuario_id" });
     }
+
+    // Obtener el carrito del usuario
+    const carrito = await carritoModel.getCarritoByUserId(usuario_id);
+
+    // Si no se encuentra el carrito, devolvemos un error
+    if (!carrito) {
+      return res.status(404).json({ message: "Carrito no encontrado" });
+    }
+
+    // Obtener los productos asociados al carrito usando el carrito.id
+    const productos = await carritoProductosModel.getProductosByCarritoId(carrito.id);
+
+    // Devolver el carrito y los productos en la respuesta
+    res.json({ carrito, productos });
+  } catch (error) {
+    // Manejo de errores si algo sale mal
+    console.error("Error al obtener el carrito:", error.message);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
 };
 
+  
+
+// Eliminar carrito de un usuario
 const deleteCarrito = async (req, res) => {
     const { id } = req.params;
 
     try {
         const result = await carritoModel.deleteCarrito(id);
         if (result) {
-            res.json({ message: 'Carrito eliminado exitosamente' });
+            res.json({ message: "Carrito eliminado exitosamente" });
         } else {
-            res.status(404).json({ message: 'Carrito no encontrado' });
+            res.status(404).json({ message: "Carrito no encontrado" });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error al eliminar el carrito', error: error.message });
+        res.status(500).json({ message: "Error al eliminar el carrito", error: error.message });
     }
 };
 
-module.exports = { createCarrito, getCarritoById, deleteCarrito };
+module.exports = { createCarrito, getCarrito, deleteCarrito };

@@ -12,6 +12,7 @@ const ordenesRoutes = require('./routes/ordenesRoutes'); // Importar las rutas d
 const authenticateRoutes = require('./routes/authenticateRoutes'); // Importar el middleware de autenticación
 const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las rutas de imágenes de perfil
 const imgProductRoutes = require('./routes/imgProductRoutes'); // Importar las rutas de imágenes de productos
+const cookieParser = require('cookie-parser');
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
@@ -22,6 +23,7 @@ const PORT = process.env.PORT || 3000; //<--- En la variable PORT guardamos el p
 // (usamos process.env.PORT para que utilice el puerto que esta definido en las variables de entorno).
 // En caso de que no exista tal variable de entorno se utilizara el puerto 3000.
 //Middleware para parsear el JSON.
+app.use(cookieParser()); // <-- para leer/analizar las cookies
 app.use(express.json()); //<--- para leer/analizar el cuerpo o los datos en formato JSON, y asi JavaScript poder leerlos.
 //Creacion de carpeta.
 app.use('/imagenProducto', express.static(path.join(__dirname, 'imagenProducto')));
@@ -31,7 +33,7 @@ app.use(cors()); // Habilitar CORS
 app.use('/api/productos', productoRoutes); // Rutas de productos
 app.use('/api/users', userRoutes); // Rutas de usuarios
 app.use('/api/categorias', categoryRoutes); // Rutas de categorias
-app.use('/api/carritos', carritoRoutes); // Rutas de carritos
+app.use('/api', carritoRoutes); // Rutas de carritos
 app.use('/api/carritoProductos', carritoProductos); // Rutas de carritoProductos
 app.use('/api/ordenes', ordenesRoutes); // Rutas de ordenes
 app.use('/api', authenticateRoutes); // Rutas de autenticación

@@ -1,38 +1,44 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const userModel = require('../models/userModel'); // <-- importamos el modelo de usuario para trabjaar con el.
+const carritoModel = require('../models/carritoModel'); // Asegúrate de que esta ruta sea correcta según tu estructura de archivos
 
+// userController.js
 const registerUser = async (req, res) => {
-    const { nombre, email, password} = req.body;
-    
+    const { nombre, email, password, productosCarrito } = req.body;
 
-    // Validamos los campos
-    if (!nombre) { //No ingresa nombre
-        return res.status(400).json({ message: 'Ingrese un nombre'});
-    } else if (!email) { //No ingresa email
-        return res.status(400).json({ message: 'Ingrese un correo electronico'})
-    } else if (!password) { //No ingresa contraseña
-        return res.status(400).json({ message: 'Ingrese una contraseña'});
-    }
-
-    //Contraseña entre 6 y 16 caracteres.
-    if(password.length < 6 || password.length > 16) {
-        return res.status(400).json({ message: 'La contraseña debe tener entre 6 y 16 caracteres.'})
+    // Validaciones
+    if (!nombre) {
+        return res.status(400).json({ message: 'Ingrese un nombre' });
+    } else if (!email) {
+        return res.status(400).json({ message: 'Ingrese un correo electrónico' });
+    } else if (!password) {
+        return res.status(400).json({ message: 'Ingrese una contraseña' });
     }
 
     try {
-        //creamos el nuevo usuario creando el modelo.
+        // Crear el usuario
         const newUser = await userModel.createUser(nombre, email, password);
+
+        // Crear el carrito asociado al usuario
+        const carrito = await carritoModel.createCarrito(newUser.id);
+
+        // Si el usuario tiene productos en el carrito de sesión, agregar al carrito
+        if (productosCarrito && productosCarrito.length > 0) {
+            await carritoModel.addProductosAlCarrito(carrito.id, productosCarrito);
+        }
+
         res.status(200).json({
             message: 'Usuario creado exitosamente',
-            user: newUser
+            user: newUser,
+            carrito: carrito
         });
-    }
-    catch (err) {
+    } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'No se pudo crear el usuario con exito. ERROR-C: ' + err.message });
+        res.status(500).json({ message: 'No se pudo crear el usuario. ERROR-C: ' + err.message });
     }
-}
+};
+
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;

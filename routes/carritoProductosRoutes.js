@@ -6,7 +6,9 @@ const carritoProductosController = require('../controllers/carritoProductosContr
 router.post('/add', carritoProductosController.addProductoToCarrito);
 
 // Eliminar producto del carrito
-router.delete('/remove/:id', carritoProductosController.removeProductoFromCarrito);
+// Cambia la ruta para recibir los parámetros desde req.params
+router.delete('/remove/:carrito_id/:producto_id', carritoProductosController.removeProductoFromCarrito);
+
 
 // Obtener productos de un carrito
 router.get('/:carrito_id', carritoProductosController.getProductosByCarritoId);

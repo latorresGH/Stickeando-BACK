@@ -6,9 +6,11 @@ const carritoController = require('../controllers/carritoController');
 router.post('/create', carritoController.createCarrito);
 
 // Obtener un carrito por ID
-router.get('/:id', carritoController.getCarritoById);
+router.get("/carrito/:usuario_id", carritoController.getCarrito);
 
 // Eliminar un carrito
 router.delete('/:id', carritoController.deleteCarrito);
+
+
 
 module.exports = router;
