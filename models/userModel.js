@@ -21,7 +21,7 @@ const createUser = async (nombre, email, password) => {
         return newUser.rows[0]; // Retorna el usuario recien creado por eso se usa la columna [0]. devuelve el objeto del usuario recién creado al código que invocó la función
     }    
     catch (error) {
-        throw new Error("No se pudo crear el usuario con exito, ERROR-M: " + error.message);
+        throw new Error(error.message);
     }
 }
 // Obtener un usuario por correo.

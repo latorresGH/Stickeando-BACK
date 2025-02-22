@@ -23,21 +23,31 @@ const registerUser = async (req, res) => {
         // Crear el carrito asociado al usuario
         const carrito = await carritoModel.createCarrito(newUser.id);
 
-        // Si el usuario tiene productos en el carrito de sesión, agregar al carrito
+        // Si el usuario tiene productos en el carrito de sesión, agregarlos al carrito
         if (productosCarrito && productosCarrito.length > 0) {
             await carritoModel.addProductosAlCarrito(carrito.id, productosCarrito);
         }
 
-        res.status(200).json({
+        // Generar el token
+        const token = jwt.sign(
+            { id: newUser.id, email: newUser.email }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '1h' }
+        );
+
+        // Responder con usuario, carrito y token
+        res.status(201).json({
             message: 'Usuario creado exitosamente',
             user: newUser,
-            carrito: carrito
+            carrito: carrito,
+            token: token // Devuelve el token
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'No se pudo crear el usuario. ERROR-C: ' + err.message });
+        res.status(500).json({ message: err.message });
     }
 };
+
 
 
 const loginUser = async (req, res) => {
