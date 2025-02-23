@@ -123,6 +123,19 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
+const getUserProfilePhoto = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await userModel.getUserById(id);
+        if (!user || !user.foto_perfil) {
+            return res.status(404).json({ message: 'Foto de perfil no encontrada.' });
+        }
+        res.sendFile(user.foto_perfil, { root: './public/images/profile' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener la foto de perfil.', error: error.message });
+    }
+};
 
 
-module.exports = {registerUser, loginUser, updateUserProfile}; // -----------------> Exportamos para userRoutes.js
+
+module.exports = {registerUser, loginUser, updateUserProfile, getUserProfilePhoto}; // -----------------> Exportamos para userRoutes.js
