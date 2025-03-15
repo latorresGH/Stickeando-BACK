@@ -14,7 +14,7 @@ const createUser = async (nombre, email, password) => {
 
         const newUser = await pool.query( //Generamos una query sql
             'INSERT INTO usuarios (nombre, email, password, rol, foto_perfil, creado_en) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *', //CURRENT_TIMESTAMP: Esta es una función de PostgreSQL que devuelve la fecha y hora actuales
-            [nombre, email, hashedPassword, 'usuario', 'user-icon']                                                             //RETURNING *: Esta parte le dice a PostgreSQL que devuelva el registro completo (todos los campos) del nuevo usuario que se acaba de insertar. El * indica que queremos todos los campos de ese registro (como el id, nombre, correo, etc.). Esto es útil para obtener el usuario recién creado con todos los valores insertados, incluyendo el id que se generó automáticamente.
+            [nombre, email, hashedPassword, 'usuario', 'user-icon.png']                                                             //RETURNING *: Esta parte le dice a PostgreSQL que devuelva el registro completo (todos los campos) del nuevo usuario que se acaba de insertar. El * indica que queremos todos los campos de ese registro (como el id, nombre, correo, etc.). Esto es útil para obtener el usuario recién creado con todos los valores insertados, incluyendo el id que se generó automáticamente.
             // $1,   $2,        $3,         $4,          $5  <- por eso en values ponemos ($1, $2, $3, $4, $5, .....)
         );
 
