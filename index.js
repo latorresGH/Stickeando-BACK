@@ -27,12 +27,16 @@ app.use(cookieParser()); // <-- para leer/analizar las cookies
 app.use(express.json()); //<--- para leer/analizar el cuerpo o los datos en formato JSON, y asi JavaScript poder leerlos.
 //Creacion de carpeta.
 app.use('/imagenProducto', express.static(path.join(__dirname, 'imagenProducto')));
+
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://tu-frontend.com'], // Agrega la URL de producción cuando esté lista
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true, // Necesario si manejas cookies o tokens en headers
-  }));
-  
+  origin: [
+      'http://localhost:3000', // Permite solicitudes locales
+      'https://stickeando.vercel.app', // Permite solicitudes desde tu frontend en Vercel
+  ],
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true, // Necesario si estás manejando cookies o tokens en los headers
+}));
+
 
 // Rutas
 app.use('/api/productos', productoRoutes); // Rutas de productos
