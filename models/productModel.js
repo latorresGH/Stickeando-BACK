@@ -34,20 +34,36 @@ const pool = require('../config/database/db.js'); // <- importamos la base de da
         }
     }
 
-    // Eliminar un producto de la base de datos
     const deleteProduct = async (id) => {
-        const query = `
-            DELETE FROM productos
-            WHERE id = $1;
-        `;
-        const values = [id];
-
+        const client = await pool.connect();
         try {
-            await pool.query(query, values);
+            await client.query('BEGIN'); // Inicia una transacción
+    
+            // Primero, desvinculamos el producto de la categoría (ponemos categoria_id a NULL)
+            const updateQuery = `
+                UPDATE productos
+                SET categoria_id = NULL
+                WHERE id = $1;
+            `;
+            await client.query(updateQuery, [id]);
+    
+            // Ahora, eliminamos el producto
+            const deleteQuery = `
+                DELETE FROM productos
+                WHERE id = $1;
+            `;
+            await client.query(deleteQuery, [id]);
+    
+            await client.query('COMMIT'); // Confirma la transacción
+            console.log('Producto eliminado correctamente');
         } catch (error) {
+            await client.query('ROLLBACK'); // Si ocurre un error, deshace la transacción
             throw new Error('Error al eliminar el producto: ERROR-M' + error.message);
+        } finally {
+            client.release(); // Libera el cliente
         }
-    }
+    };
+    
 
     const getProductById = async (id) => {
         const query = 'SELECT * FROM productos WHERE id = $1';
