@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const fetch = require('node-fetch'); // Use require() for node-fetch
 
 function keepAlive() {
     setInterval(() => {
@@ -8,4 +8,4 @@ function keepAlive() {
     }, 5 * 60 * 1000); // Cada 5 minutos
 }
 
-module.exports = keepAlive;
+module.exports = keepAlive; // Export the keepAlive function

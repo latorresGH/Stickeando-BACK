@@ -10,9 +10,10 @@ const pool = new Pool({ // <- creamos el pool con los datos del dotenv.
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    // ssl: {
+    //     rejectUnauthorized: false
+    // }
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
 pool.connect((err) => { // <- intento de conexión para confirmar que se haga la conexión correctamente.
