@@ -8,7 +8,7 @@ const isAdmin = require('../middleware/isAdmin'); // Middleware de autorización
 
 
 // Ruta para crear un producto (solo administradores)
-router.post('/create', authenticate, isAdmin, upload.single('imagen_url'), productController.createProduct);
+router.post('/create', authenticate, isAdmin, upload.single('imagen_url'), upload.cropImage, productController.createProduct);
 
 // Ruta para actualizar un producto (solo administradores)
 router.put('/update/:id', authenticate, isAdmin, upload.single('imagen_url'), productController.updateProduct);
