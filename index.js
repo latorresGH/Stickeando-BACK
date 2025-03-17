@@ -13,6 +13,9 @@ const authenticateRoutes = require('./routes/authenticateRoutes'); // Importar e
 const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las rutas de imágenes de perfil
 const imgProductRoutes = require('./routes/imgProductRoutes'); // Importar las rutas de imágenes de productos
 const cookieParser = require('cookie-parser');
+const keepAlive = require('./middleware/keepAlive');
+
+keepAlive();
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
