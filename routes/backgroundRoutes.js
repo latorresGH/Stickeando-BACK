@@ -18,7 +18,7 @@ router.get('/background/:filename', (req, res) => {
   const filePath = path.join(__dirname, '../public/background', req.params.filename);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      return res.status(404).send('Imagen no encontrada porque ', err);
+      return res.status(404).send('Imagen no encontrada');
     }
     res.sendFile(filePath);
   });
