@@ -85,8 +85,8 @@ router.put("/background/selected", async (req, res) => {
       // Devolver la URL completa con '/public/background/'
       res.json({ imageUrl: `/public/background/${filename}` }); // Devuelve la ruta completa
     } catch (error) {
-      console.error("Error al obtener la imagen seleccionada:", error);
-      res.status(500).json({ error: "Error al obtener la imagen de fondo" });
+      console.error("Error al obtener la imagen seleccionada:", error, imageUrl);
+      res.status(500).json({ error: "Error al obtener la imagen de fondo", imageUrl });
     }
   });
   
