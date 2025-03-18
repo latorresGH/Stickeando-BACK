@@ -13,6 +13,7 @@ const authenticateRoutes = require('./routes/authenticateRoutes'); // Importar e
 const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las rutas de imágenes de perfil
 const imgProductRoutes = require('./routes/imgProductRoutes'); // Importar las rutas de imágenes de productos
 const cookieParser = require('cookie-parser');
+const backgroundRoutes = require("./routes/backgroundRoutes");
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
@@ -48,15 +49,16 @@ app.use('/api/ordenes', ordenesRoutes); // Rutas de ordenes
 app.use('/api', authenticateRoutes); // Rutas de autenticación
 app.use('/api', imgprofileRoutes); // Rutas de imágenes de perfil
 app.use('/api', imgProductRoutes); // Rutas de imágenes de perfil
+app.use("/api", backgroundRoutes);
 
 setInterval(async () => {
   try {
-      const result = await pool.query('SELECT NOW()'); // Consulta de prueba
+      const result = await pool.query('SELECT * FROM categorias'); // Consulta de prueba
       console.log('Consulta ejecutada:', result.rows[0]);
   } catch (err) {
       console.error('Error en la consulta:', err);
   }
-}, 10 * 60 * 1000); 
+}, 5 * 60 * 1000); 
 
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
