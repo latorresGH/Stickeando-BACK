@@ -77,18 +77,18 @@ router.put("/background/selected", async (req, res) => {
       const result = await db.query("SELECT filename FROM backgrounds WHERE is_selected = TRUE LIMIT 1");
   
       if (result.rows.length === 0) {
-        return res.json({ imageUrl: "/background/default.jpg" }); // Imagen por defecto
+        return res.json({ imageUrl: "/api/background/default.jpg" }); // Imagen por defecto
       }
   
-      // El nombre de la imagen, que es un archivo dentro de /public/background
       const filename = result.rows[0].filename;
-      // Devolver la URL completa con '/public/background/'
-      res.json({ imageUrl: `/public/background/${filename}` }); // Devuelve la ruta completa
+      // Devolver la ruta accesible desde /api/background/
+      res.json({ imageUrl: `/api/background/${filename}` }); // Devuelve la ruta para acceder a la imagen a través del endpoint API
     } catch (error) {
-      console.error("Error al obtener la imagen seleccionada:", error, imageUrl);
-      res.status(500).json({ error: "Error al obtener la imagen de fondo", imageUrl });
+      console.error("Error al obtener la imagen seleccionada:", error);
+      res.status(500).json({ error: "Error al obtener la imagen de fondo" });
     }
   });
+  
   
   
   
