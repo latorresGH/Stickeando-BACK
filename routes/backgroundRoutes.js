@@ -80,7 +80,13 @@ router.put("/background/selected", async (req, res) => {
         return res.json({ imageUrl: "/api/background/default.jpg" }); // Imagen por defecto
       }
   
-      const imageUrl = result.rows[0].image_url;
+      let imageUrl = result.rows[0].image_url;
+  
+      // Si la URL comienza con '/public/background/', cambiarla a '/api/background/'
+      if (imageUrl.startsWith("/public/background/")) {
+        imageUrl = imageUrl.replace("/public/background/", "/api/background/");
+      }
+  
       res.json({ imageUrl: imageUrl }); // Devolver la URL completa de la imagen seleccionada
     } catch (error) {
       console.error("Error al obtener la imagen seleccionada:", error);
@@ -93,5 +99,7 @@ router.put("/background/selected", async (req, res) => {
   
   
   
+  
 
 module.exports = router;
+
