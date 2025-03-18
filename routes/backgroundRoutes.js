@@ -49,22 +49,26 @@ router.post("/background/selected", (req, res) => {
 
 
 router.put("/background/selected", async (req, res) => {
-  const { filename } = req.body;
-  if (!filename) return res.status(400).json({ error: "Falta el nombre del archivo" });
-
-  try {
-    // Desmarcar cualquier imagen seleccionada
-    await db.query("UPDATE backgrounds SET is_selected = FALSE");
-
-    // Marcar la nueva imagen como seleccionada
-    await db.query("UPDATE backgrounds SET is_selected = TRUE WHERE image_url = $1", [filename]);
-
-    res.json({ message: "Fondo actualizado con éxito" });
-  } catch (error) {
-    console.error("Error al actualizar el fondo:", error);
-    res.status(500).json({ error: "Error al actualizar la imagen de fondo" });
-  }
-});
+    const { filename } = req.body;
+    if (!filename) return res.status(400).json({ error: "Falta el nombre del archivo" });
+  
+    try {
+      // Desmarcar cualquier imagen seleccionada
+      await db.query("UPDATE backgrounds SET is_selected = FALSE");
+  
+      // Concatenar el prefijo '/public/background/' al nombre del archivo
+      const imageUrl = `/public/background/${filename}`;
+  
+      // Marcar la nueva imagen como seleccionada
+      await db.query("UPDATE backgrounds SET is_selected = TRUE WHERE image_url = $1", [imageUrl]);
+  
+      res.json({ message: "Fondo actualizado con éxito" });
+    } catch (error) {
+      console.error("Error al actualizar el fondo:", error);
+      res.status(500).json({ error: "Error al actualizar la imagen de fondo" });
+    }
+  });
+  
 
 
 
