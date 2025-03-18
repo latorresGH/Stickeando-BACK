@@ -85,9 +85,11 @@ router.put("/background/selected", async (req, res) => {
       res.json({ imageUrl: `/api/background/${filename}` }); // Devuelve la ruta para acceder a la imagen a través del endpoint API
     } catch (error) {
       console.error("Error al obtener la imagen seleccionada:", error);
-      res.status(500).json({ error: "Error al obtener la imagen de fondo" });
+      // Responder con un JSON válido, para manejar el error en el frontend
+      res.status(500).json({ error: "Error al obtener la imagen de fondo", details: error.message });
     }
   });
+  
   
   
   
