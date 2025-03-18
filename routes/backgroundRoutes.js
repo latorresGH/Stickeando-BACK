@@ -18,7 +18,7 @@ router.get('/background/:filename', (req, res) => {
   const filePath = path.join(__dirname, '../public/background', req.params.filename);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      return res.status(404).send('Imagen no encontrada');
+      return res.status(404).send('Imagen no encontrada porque ', err);
     }
     res.sendFile(filePath);
   });
@@ -80,13 +80,7 @@ router.put("/background/selected", async (req, res) => {
         return res.json({ imageUrl: "/api/background/default.jpg" }); // Imagen por defecto
       }
   
-      let imageUrl = result.rows[0].image_url;
-  
-      // Si la URL comienza con '/public/background/', cambiarla a '/api/background/'
-      if (imageUrl.startsWith("/public/background/")) {
-        imageUrl = imageUrl.replace("/public/background/", "/api/background/");
-      }
-  
+      let imageUrl = result.rows[0].image_url; 
       res.json({ imageUrl: imageUrl }); // Devolver la URL completa de la imagen seleccionada
     } catch (error) {
       console.error("Error al obtener la imagen seleccionada:", error);
