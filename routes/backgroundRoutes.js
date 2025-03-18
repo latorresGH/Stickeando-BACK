@@ -57,7 +57,7 @@ router.put("/background/selected", async (req, res) => {
     await db.query("UPDATE backgrounds SET is_selected = FALSE");
 
     // Marcar la nueva imagen como seleccionada
-    await db.query("UPDATE backgrounds SET is_selected = TRUE WHERE filename = $1", [filename]);
+    await db.query("UPDATE backgrounds SET is_selected = TRUE WHERE image_url = $1", [filename]);
 
     res.json({ message: "Fondo actualizado con éxito" });
   } catch (error) {
