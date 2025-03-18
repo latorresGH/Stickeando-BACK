@@ -82,13 +82,14 @@ router.put("/background/selected", async (req, res) => {
   
       // El nombre de la imagen, que es un archivo dentro de /public/background
       const filename = result.rows[0].filename;
-      // Devolver la URL completa, no solo el nombre del archivo
-      res.json({ imageUrl: `/background/${filename}` }); // Devuelve la ruta para acceder al archivo
+      // Devolver la URL completa con '/public/background/'
+      res.json({ imageUrl: `/public/background/${filename}` }); // Devuelve la ruta completa
     } catch (error) {
       console.error("Error al obtener la imagen seleccionada:", error);
       res.status(500).json({ error: "Error al obtener la imagen de fondo" });
     }
   });
+  
   
   
   
