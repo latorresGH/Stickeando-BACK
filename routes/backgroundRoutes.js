@@ -4,6 +4,7 @@ const upload = require("../middleware/uploadBackground");
 const backgroundController = require("../controllers/backgroundController");
 const path = require("path");
 const fs = require("fs");
+const db = require("../config/database/db")
 
 // const selectedBackgroundPath = path.join(__dirname, "../public/background/selectedBackground.txt");
 
@@ -45,7 +46,7 @@ router.post("/background/selected", (req, res) => {
   });
 });
 
-const db = require("../db"); // Asegúrate de importar la conexión a PostgreSQL
+
 
 router.put("/background/selected", async (req, res) => {
   const { filename } = req.body;
