@@ -72,7 +72,7 @@ router.put("/background/selected", async (req, res) => {
 
 
 
-router.get("/background/selected", async (req, res) => {
+  router.get("/background/selected", async (req, res) => {
     try {
       const result = await db.query("SELECT filename FROM backgrounds WHERE is_selected = TRUE LIMIT 1");
   
@@ -81,12 +81,13 @@ router.get("/background/selected", async (req, res) => {
       }
   
       const filename = result.rows[0].filename;
-      res.json({ imageUrl: `/background/${filename}` });
+      res.json({ imageUrl: filename }); // Ya contiene "/public/background/filename"
     } catch (error) {
       console.error("Error al obtener la imagen seleccionada:", error);
       res.status(500).json({ error: "Error al obtener la imagen de fondo" });
     }
   });
+  
   
 
 module.exports = router;
