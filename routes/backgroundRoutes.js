@@ -5,25 +5,26 @@ const backgroundController = require("../controllers/backgroundController");
 const path = require("path");
 const fs = require("fs");
 
-const selectedBackgroundPath = path.join(__dirname, "../public/background/selectedBackground.txt");
+// const selectedBackgroundPath = path.join(__dirname, "../public/background/selectedBackground.txt");
 
-// Servir imágenes desde la carpeta 'public/background'
-router.use('/backgrounds', express.static(path.join(__dirname, '../public/background')));
+// Ruta estática para servir imágenes desde la carpeta 'public/background'
+router.use('/background', express.static(path.join(__dirname, '../public/background')));
 
-// Subir una nueva imagen de fondo
-router.post("/backgrounds", upload.single("background"), backgroundController.uploadBackground);
+router.post("/background", upload.single("background"), backgroundController.uploadBackground);
 
-// Obtener una imagen específica
-router.get('/backgrounds/:filename', (req, res) => {
+// No necesitas esta ruta si ya usas express.static, pero si decides hacerlo manualmente:
+router.get('/background/:filename', (req, res) => {
   const filePath = path.join(__dirname, '../public/background', req.params.filename);
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send("Imagen no encontrada");
-  }
-  res.sendFile(filePath);
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).send('Imagen no encontrada');
+    }
+    res.sendFile(filePath);
+  });
 });
 
 // Obtener lista de imágenes disponibles
-router.get("/backgrounds/list", (req, res) => {
+router.get("/backgrounds", (req, res) => {
   const directoryPath = path.join(__dirname, "../public/background");
   fs.readdir(directoryPath, (err, files) => {
     if (err) {
@@ -34,8 +35,7 @@ router.get("/backgrounds/list", (req, res) => {
   });
 });
 
-// Seleccionar un fondo
-router.post("/backgrounds/selected", (req, res) => {
+router.post("/background/selected", (req, res) => {
   const { filename } = req.body;
   if (!filename) return res.status(400).json({ error: "Falta el nombre del archivo" });
 
@@ -45,18 +45,43 @@ router.post("/backgrounds/selected", (req, res) => {
   });
 });
 
-// Obtener el fondo seleccionado
-router.get("/backgrounds/selected", (req, res) => {
-  if (!fs.existsSync(selectedBackgroundPath)) {
-    return res.json({ imageUrl: "/backgrounds/default.jpg" }); // Imagen por defecto
+const db = require("../db"); // Asegúrate de importar la conexión a PostgreSQL
+
+router.put("/background/selected", async (req, res) => {
+  const { filename } = req.body;
+  if (!filename) return res.status(400).json({ error: "Falta el nombre del archivo" });
+
+  try {
+    // Desmarcar cualquier imagen seleccionada
+    await db.query("UPDATE backgrounds SET is_selected = FALSE");
+
+    // Marcar la nueva imagen como seleccionada
+    await db.query("UPDATE backgrounds SET is_selected = TRUE WHERE filename = $1", [filename]);
+
+    res.json({ message: "Fondo actualizado con éxito" });
+  } catch (error) {
+    console.error("Error al actualizar el fondo:", error);
+    res.status(500).json({ error: "Error al actualizar la imagen de fondo" });
   }
-
-  fs.readFile(selectedBackgroundPath, "utf8", (err, filename) => {
-    if (err) return res.status(500).json({ error: "Error al leer la imagen seleccionada" });
-
-    const imageUrl = `/backgrounds/${filename.trim()}`;
-    res.json({ imageUrl });
-  });
 });
+
+
+
+router.get("/background/selected", async (req, res) => {
+    try {
+      const result = await db.query("SELECT filename FROM backgrounds WHERE is_selected = TRUE LIMIT 1");
+  
+      if (result.rows.length === 0) {
+        return res.json({ imageUrl: "/background/default.jpg" }); // Imagen por defecto
+      }
+  
+      const filename = result.rows[0].filename;
+      res.json({ imageUrl: `/background/${filename}` });
+    } catch (error) {
+      console.error("Error al obtener la imagen seleccionada:", error);
+      res.status(500).json({ error: "Error al obtener la imagen de fondo" });
+    }
+  });
+  
 
 module.exports = router;
