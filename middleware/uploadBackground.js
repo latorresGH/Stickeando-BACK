@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
     cb(null, "public/background/"); // Carpeta donde se guardará la imagen
   },
   filename: (req, file, cb) => {
-    cb(null, `background-${Date.now()}${path.extname(file.originalname)}`);
+    cb(null, `background-${Date.now()}${path.extname(file.originalname)}`); // Nombre único para evitar colisiones
   },
 });
 

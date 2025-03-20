@@ -38,6 +38,8 @@ app.use(cors({
   credentials: true, // Necesario si estás manejando cookies o tokens en los headers
 }));
 
+app.use('/uploads', express.static('uploads'));
+
 
 // Rutas
 app.use('/api/productos', productoRoutes); // Rutas de productos
