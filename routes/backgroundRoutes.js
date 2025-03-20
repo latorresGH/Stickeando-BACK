@@ -73,24 +73,32 @@ router.get("/background/selected", async (req, res) => {
   try {
     const result = await db.query("SELECT image_url FROM backgrounds WHERE is_selected = TRUE LIMIT 1");
 
+    console.log("Resultado de la consulta:", result.rows); // <-- 🔴 Muestra lo que devuelve la DB
+
     if (result.rows.length === 0) {
-      return res.json({ imageUrl: "/backgrounds/default.jpg" }); // Imagen por defecto
+      console.log("⚠️ No se encontró una imagen seleccionada.");
+      return res.status(404).json({ error: "Imagen no encontrada" });
     }
 
     let imageUrl = result.rows[0].image_url;
+    console.log("URL original en la DB:", imageUrl); // <-- 🔴 Verifica la URL antes de modificarla
 
-    // Remover "/public" para que coincida con la ruta correcta en el servidor
+    // Remover "/public" si está en la ruta
     imageUrl = imageUrl.replace("/public", "");
+    console.log("URL después de modificarla:", imageUrl); // <-- 🔴 Verifica la URL corregida
 
     // Asegurar que la URL sea accesible desde el frontend
-    imageUrl = `https://stickeando.onrender.com${imageUrl}`;
+    imageUrl = `https://stickeando.onrender.com/api${imageUrl}`;
+
+    console.log("URL final enviada al frontend:", imageUrl); // <-- 🔴 Verifica la URL final
 
     res.json({ imageUrl });
   } catch (error) {
-    console.error("Error al obtener la imagen seleccionada:", error);
+    console.error("❌ Error al obtener la imagen seleccionada:", error);
     res.status(500).json({ error: "Error al obtener la imagen de fondo" });
   }
 });
+
 
   
   
