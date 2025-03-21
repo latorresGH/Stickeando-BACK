@@ -52,7 +52,7 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     // Enviar respuesta de éxito con el nombre de archivo correcto
     res.status(200).json({
       message: 'PDF generado exitosamente',
-      filePath: `http://localhost:3001/pedidos/${fileName}`, // Usar el nombre de archivo generado por multer
+      filePath: `https://stickeando.onrender.com/pedidos/${fileName}`, // Usar el nombre de archivo generado por multer
     });
   } catch (error) {
     console.error('Error generando PDF:', error);
