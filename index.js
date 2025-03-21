@@ -14,6 +14,7 @@ const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las r
 const imgProductRoutes = require('./routes/imgProductRoutes'); // Importar las rutas de imágenes de productos
 const cookieParser = require('cookie-parser');
 const backgroundRoutes = require("./routes/backgroundRoutes");
+const pdfRoutes = require("./routes/pdfRoutes");
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
@@ -39,7 +40,7 @@ app.use(cors({
 }));
 
 
-
+app.use("/pedidos", express.static(path.join(__dirname, "pedidos")));
 // Rutas
 app.use('/api/productos', productoRoutes); // Rutas de productos
 app.use('/api/users', userRoutes); // Rutas de usuarios
@@ -52,7 +53,7 @@ app.use('/api', imgprofileRoutes); // Rutas de imágenes de perfil
 app.use('/api', imgProductRoutes); // Rutas de imágenes de perfil
 app.use("/api", backgroundRoutes);
 app.use('/uploads', express.static('uploads'));
-
+app.use("/api", pdfRoutes); // Aquí agregas las rutas de PDFs
 // setInterval(async () => {
 //   try {
 //       const result = await pool.query('SELECT * FROM categorias'); // Consulta de prueba
