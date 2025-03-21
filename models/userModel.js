@@ -3,27 +3,28 @@ const bcrypt = require('bcryptjs'); // <- importamos bcrypt para encriptar los d
 
 // Primera funcion. Crear usuario.
 const createUser = async (nombre, email, password) => {
-    try {                       // pool.query es para hacer solicitudes a la base de datos
-        const userExist = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]); //<- WHERE email = $1: La condición que estamos buscando. $1 es un marcador de posición (placeholders) que se usa para evitar inyecciones SQL. Se reemplaza con el valor que se pasa como parámetro en el arreglo [email]. Entonces, esta parte de la consulta está buscando un usuario cuyo campo email coincida con el valor de email que recibimos como parámetro.
-        if (userExist.rows.length > 0) {// <- userExists es donde tenemos la consulta, rows seria el array donde estan los resultados de la consulta y si hay mas de 1 columna en el resultado es porque existe un email igual a ese por lo tanto ya existe.
-            throw new Error("El email ya está registrado.")
+    try {    
+        const emailLowerCase = email.toLowerCase(); // Convertimos el email a minúsculas
+
+        const userExist = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLowerCase]);
+        if (userExist.rows.length > 0) {
+            throw new Error("El email ya está registrado.");
         }
 
-        const salt = await bcrypt.genSalt(10); //<- generamos el "salt" que vendria a ser un valor aleatorio para encriptarla y que jamas se repita una contraseña
-        const hashedPassword = await bcrypt.hash(password, salt);  //<- hasheamos la contraseña combinando la contraseña con el salt.
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = await pool.query( //Generamos una query sql
-            'INSERT INTO usuarios (nombre, email, password, rol, foto_perfil, creado_en) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *', //CURRENT_TIMESTAMP: Esta es una función de PostgreSQL que devuelve la fecha y hora actuales
-            [nombre, email, hashedPassword, 'usuario', 'user-icon.png']                                                             //RETURNING *: Esta parte le dice a PostgreSQL que devuelva el registro completo (todos los campos) del nuevo usuario que se acaba de insertar. El * indica que queremos todos los campos de ese registro (como el id, nombre, correo, etc.). Esto es útil para obtener el usuario recién creado con todos los valores insertados, incluyendo el id que se generó automáticamente.
-            // $1,   $2,        $3,         $4,          $5  <- por eso en values ponemos ($1, $2, $3, $4, $5, .....)
+        const newUser = await pool.query(
+            'INSERT INTO usuarios (nombre, email, password, rol, foto_perfil, creado_en) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *',
+            [nombre, emailLowerCase, hashedPassword, 'usuario', 'user-icon.png']
         );
 
-        return newUser.rows[0]; // Retorna el usuario recien creado por eso se usa la columna [0]. devuelve el objeto del usuario recién creado al código que invocó la función
-    }    
-    catch (error) {
+        return newUser.rows[0];
+    } catch (error) {
         throw new Error(error.message);
     }
-}
+};
+
 // Obtener un usuario por correo.
 const getUserByEmail = async (email) => {
     try {

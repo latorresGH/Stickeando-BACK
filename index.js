@@ -38,7 +38,6 @@ app.use(cors({
   credentials: true, // Necesario si estás manejando cookies o tokens en los headers
 }));
 
-app.use('/uploads', express.static('uploads'));
 
 
 // Rutas
@@ -52,6 +51,7 @@ app.use('/api', authenticateRoutes); // Rutas de autenticación
 app.use('/api', imgprofileRoutes); // Rutas de imágenes de perfil
 app.use('/api', imgProductRoutes); // Rutas de imágenes de perfil
 app.use("/api", backgroundRoutes);
+app.use('/uploads', express.static('uploads'));
 
 // setInterval(async () => {
 //   try {
