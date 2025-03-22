@@ -2,26 +2,18 @@ const productModel = require('../models/productModel');
 
 //Crear producto
 const createProduct = async (req, res) => {
-    const { titulo, precio, categoria_id } = req.body;
-    const imagen_url = req.file ? req.file.path : null; // URL generada por Cloudinary
-
-    if (!titulo || !precio || !categoria_id || !imagen_url) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-    }
-
-    if (isNaN(categoria_id)) {
-        return res.status(400).json({ message: "El campo categoria_id debe ser un número válido" });
-    }
-
     try {
-        const product = await productModel.createProduct(titulo, precio, categoria_id, imagen_url);
-        res.status(200).json({ message: 'Producto creado con éxito', product });
+      const { titulo, precio, categoria_id } = req.body;
+      const imageUrl = req.file.path; // URL segura de Cloudinary
+  
+      const newProduct = await productModel.createProduct(titulo, precio, imageUrl, categoria_id);
+  
+      res.json({ message: 'Producto creado', product: newProduct });
     } catch (error) {
-        res.status(500).json({ message: 'Error al crear el producto', error: error.message });
+      console.error('Error al subir producto:', error);
+      res.status(500).json({ message: 'Error al subir producto' });
     }
-};
-
-module.exports = { createProduct };
+  };
 
 
 const updateProduct = async (req, res) => {
