@@ -5,6 +5,7 @@ const { upload } = require('../config/cloudinary/cloudinary'); // Importamos con
 const productModel = require('../models/productModel');
 const authenticate = require('../middleware/authenticate'); // Middleware de autenticación
 const isAdmin = require('../middleware/isAdmin'); // Middleware de autorización (rol de admin)
+const pool = require('../config/database/db'); 
 
 
 // Ruta para crear un producto (solo administradores)
