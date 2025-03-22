@@ -13,6 +13,18 @@ router.get('/backgrounds', async (req, res) => {
     }
 });
 
+// 🔹 Seleccionar un background
+router.put('/backgrounds/:id/select', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await pool.query('UPDATE backgrounds SET is_selected = false');
+        await pool.query('UPDATE backgrounds SET is_selected = true WHERE id = $1', [id]);
+        res.json({ message: 'Background seleccionado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al seleccionar el background' });
+    }
+});
+
 // 🔹 Obtener el background seleccionado
 router.get('/backgrounds/selected', async (req, res) => {
     try {
