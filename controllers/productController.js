@@ -2,28 +2,27 @@ const productModel = require('../models/productModel');
 
 //Crear producto
 const createProduct = async (req, res) => {
-    const { titulo, precio, categoria_id} = req.body;
-    const imagen_url = req.file ? `${req.file.filename}` : null;
+    const { titulo, precio, categoria_id } = req.body;
+    const imagen_url = req.file ? req.file.path : null; // URL generada por Cloudinary
 
-    // Validar que los campos no estén vacíos
     if (!titulo || !precio || !categoria_id || !imagen_url) {
-        return res.status(400).json({message: 'Todos los campos son obligatorios'});
+        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
     if (isNaN(categoria_id)) {
         return res.status(400).json({ message: "El campo categoria_id debe ser un número válido" });
     }
 
-    // console.log({ titulo, precio, categoria_id, imagen_url });
-
-    // Crear el producto
     try {
-        const product = await productModel.createProduct(titulo, precio, categoria_id,imagen_url);
-        res.status(200).json({ meesage: 'Producto creado con exito', product });
+        const product = await productModel.createProduct(titulo, precio, categoria_id, imagen_url);
+        res.status(200).json({ message: 'Producto creado con éxito', product });
     } catch (error) {
-        res.status(500).json({ message: 'Ocurrió un error al crear el producto, ERROR-C: ', error: error.message });
+        res.status(500).json({ message: 'Error al crear el producto', error: error.message });
     }
-}
+};
+
+module.exports = { createProduct };
+
 
 const updateProduct = async (req, res) => {
     const { id } = req.params;

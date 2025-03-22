@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../config/multer/upload');
 const productController = require('../controllers/productController');
+const { upload } = require('../config/cloudinary/cloudinary'); // Importamos configuración de Cloudinary
 const productModel = require('../models/productModel');
 const authenticate = require('../middleware/authenticate'); // Middleware de autenticación
 const isAdmin = require('../middleware/isAdmin'); // Middleware de autorización (rol de admin)
 
 
 // Ruta para crear un producto (solo administradores)
-router.post('/create', authenticate, isAdmin, upload.single('imagen_url'), productController.createProduct);
+// router.post('/create', authenticate, isAdmin, upload.single('imagen_url'), productController.createProduct);
+router.post('/create', authenticate, isAdmin, upload.single('imagen'), productController.createProduct);
 
 // Ruta para actualizar un producto (solo administradores)
 router.put('/update/:id', authenticate, isAdmin, upload.single('imagen_url'), productController.updateProduct);
