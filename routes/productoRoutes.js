@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../config/multer/upload');
 const productController = require('../controllers/productController');
 const { upload } = require('../config/cloudinary/cloudinary'); // Importamos configuración de Cloudinary
 const productModel = require('../models/productModel');
