@@ -38,15 +38,37 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     // Crear el archivo PDF
     const doc = new pdfkit();
     doc.pipe(fs.createWriteStream(filePath));
+
+    // Establecer la fuente y tamaño
     doc.fontSize(25).text('Factura de Compra', { align: 'center' });
+
+    // Espacio para la información del usuario
     doc.fontSize(12).text(`Usuario: ${usuario.nombre}`, { align: 'left' });
     doc.text(`Email: ${usuario.correo}`, { align: 'left' });
+
+    // Salto de línea para separar la información del carrito
+    doc.moveDown(1);
+
+    // Título para los productos
     doc.text('Productos comprados:', { align: 'left' });
-    
-    carrito.forEach(item => {
-      doc.text(`${item.titulo} - $${item.precio} x ${item.cantidad}`, { align: 'left' });
+
+    // Establecer la posición inicial para el listado de productos
+    let yPos = doc.y + 10; // El valor actual de y será el punto de inicio para los productos
+
+    // Ajuste de precio antes de los productos
+    doc.text('Precio Total:', { align: 'left' });
+    let total = 0; // Variable para el total
+    carrito.forEach((item, index) => {
+      const lineText = `${item.titulo} - $${item.precio} x ${item.cantidad}`;
+      doc.text(lineText, { continued: true }).text(` $${item.precio * item.cantidad}`);
+      total += item.precio * item.cantidad; // Calculando el total
     });
 
+    // Salto de línea antes de la sección del precio total
+    doc.moveDown(1);
+    doc.text(`Precio Total: $${total}`, { align: 'left' });
+
+    // Finaliza el documento
     doc.end();
 
     // Enviar respuesta de éxito con el nombre de archivo correcto
@@ -59,5 +81,6 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     res.status(500).json({ error: 'Error generando PDF' });
   }
 });
+
 
 module.exports = router;
