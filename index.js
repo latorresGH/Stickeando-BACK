@@ -30,13 +30,19 @@ app.use(express.json()); //<--- para leer/analizar el cuerpo o los datos en form
 //Creacion de carpeta.
 app.use('/imagenProducto', express.static(path.join(__dirname, 'imagenProducto')));
 
+// app.use(cors({
+//   origin: [
+//       'http://localhost:3000', // Permite solicitudes locales
+//       'https://stickeando.vercel.app', // Permite solicitudes desde tu frontend en Vercel
+//   ],
+//   methods: 'GET,POST,PUT,DELETE',
+//   credentials: true, // Necesario si estás manejando cookies o tokens en los headers
+// }));
+
 app.use(cors({
-  origin: [
-      'http://localhost:3000', // Permite solicitudes locales
-      'https://stickeando.vercel.app', // Permite solicitudes desde tu frontend en Vercel
-  ],
+  origin: '*', // Prueba permitiendo cualquier origen temporalmente
   methods: 'GET,POST,PUT,DELETE',
-  credentials: true, // Necesario si estás manejando cookies o tokens en los headers
+  allowedHeaders: 'Content-Type,Authorization'
 }));
 
 

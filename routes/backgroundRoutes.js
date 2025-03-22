@@ -1,19 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/database/db'); // Conexión a PostgreSQL
-const multer = require('multer');
-const path = require('path');
-
-// Configurar almacenamiento con multer
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Nombre único para cada imagen
-    }
-});
-const upload = multer({ storage });
+const pool = require('../config/database/db'); 
+const { upload, cloudinary } = require('../config/cloudinary/cloudinary'); // Importar configuración de Cloudinary
 
 // 🔹 Obtener todos los backgrounds
 router.get('/backgrounds', async (req, res) => {
@@ -35,25 +23,13 @@ router.get('/backgrounds/selected', async (req, res) => {
     }
 });
 
-// 🔹 Seleccionar un background
-router.put('/backgrounds/:id/select', async (req, res) => {
-    const { id } = req.params;
-    try {
-        await pool.query('UPDATE backgrounds SET is_selected = false');
-        await pool.query('UPDATE backgrounds SET is_selected = true WHERE id = $1', [id]);
-        res.json({ message: 'Background seleccionado correctamente' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al seleccionar el background' });
-    }
-});
-
-// 🔹 Subir y agregar un nuevo background
+// 🔹 Subir un nuevo background
 router.post('/backgrounds', upload.single('image'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No se subió ninguna imagen' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`; // Ruta de la imagen guardada
+    const imageUrl = req.file.path; // URL generada por Cloudinary
     try {
         const result = await pool.query(
             'INSERT INTO backgrounds (image_url, is_selected) VALUES ($1, false) RETURNING *',
@@ -65,15 +41,31 @@ router.post('/backgrounds', upload.single('image'), async (req, res) => {
     }
 });
 
+
 // 🔹 Eliminar un background
 router.delete('/backgrounds/:id', async (req, res) => {
     const { id } = req.params;
     try {
+        // 🔹 Buscar la URL de la imagen en la base de datos
+        const background = await pool.query('SELECT image_url FROM backgrounds WHERE id = $1', [id]);
+        if (!background.rows.length) {
+            return res.status(404).json({ error: 'Background no encontrado' });
+        }
+
+        // 🔹 Extraer el ID público de Cloudinary
+        const publicId = background.rows[0].image_url.split('/').pop().split('.')[0];
+
+        // 🔹 Eliminar la imagen de Cloudinary
+        await cloudinary.uploader.destroy(`backgrounds/${publicId}`);
+
+        // 🔹 Eliminar el registro de la base de datos
         await pool.query('DELETE FROM backgrounds WHERE id = $1', [id]);
+
         res.json({ message: 'Background eliminado correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar el background' });
     }
 });
+
 
 module.exports = router;
