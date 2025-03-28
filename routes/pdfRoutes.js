@@ -39,8 +39,6 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     const doc = new pdfkit();
     doc.pipe(fs.createWriteStream(filePath));
 
-    // Establecer la fuente y tamaño
-    doc.fontSize(25).text('Factura de Compra', { align: 'center' });
 
     // Primero, calculamos el precio total
     let total = 0; // Variable para el total
@@ -53,9 +51,6 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
 
     // Información del usuario
     doc.moveDown(1); // Añadimos un salto de línea después del precio total
-    doc.fontSize(12).text(`Pedido de Usuario:`, { align: 'left' });
-    doc.text(`Nombre: ${usuario.nombre}`, { align: 'left' });
-    doc.text(`Email: ${usuario.correo}`, { align: 'left' });
 
     // Salto de línea para separar la información del carrito
     doc.moveDown(1);
