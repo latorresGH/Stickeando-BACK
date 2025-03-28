@@ -41,19 +41,18 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
 
     // Establecer la fuente y tamaño
     doc.fontSize(25).text('Factura de Compra', { align: 'center' });
-    doc.moveDown(1); // Añadir un espacio después del título
 
-    // Precio Total antes de la información del usuario y productos
+    // Primero, calculamos el precio total
     let total = 0; // Variable para el total
     carrito.forEach((item) => {
       total += item.precio * item.cantidad; // Calculando el total
     });
 
-    // Mostrar el precio total
+    // Aseguramos que el "Precio Total" se imprima en la primera línea
     doc.fontSize(14).text(`Precio Total: $${total}`, { align: 'left' });
-    doc.moveDown(1); // Añadir espacio después del precio total
 
     // Información del usuario
+    doc.moveDown(1); // Añadimos un salto de línea después del precio total
     doc.fontSize(12).text(`Pedido de Usuario:`, { align: 'left' });
     doc.text(`Nombre: ${usuario.nombre}`, { align: 'left' });
     doc.text(`Email: ${usuario.correo}`, { align: 'left' });
@@ -64,17 +63,10 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     // Título para los productos
     doc.text('Productos comprados:', { align: 'left' });
 
-    // Ajustar manualmente la posición vertical para los productos
-    let currentY = doc.y;
+    // Listado de productos
     carrito.forEach((item) => {
       const lineText = `${item.titulo} - $${item.precio} x ${item.cantidad}`;
       doc.text(lineText, { continued: true }).text(` $${item.precio * item.cantidad}`);
-
-      // Controlar la posición para evitar que se solapen
-      currentY = doc.y; // Actualizar la posición de Y después de cada línea
-      if (currentY > 700) { // Si llegamos al final de la página, hacer un salto
-        doc.addPage();
-      }
     });
 
     // Finaliza el documento
