@@ -13,4 +13,7 @@ router.delete('/delete/:id', authenticate, isAdmin, categoryController.deleteCat
 // Ruta para obtener todas las categorías (accesible para todos)
 router.get('/all', categoryController.getCategories);
 
+// Ruta para actualizar una categoría (solo administradores)
+router.put('/update/:id', authenticate, isAdmin, categoryController.updateCategory);
+
 module.exports = router;

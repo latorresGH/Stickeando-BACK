@@ -16,6 +16,40 @@ const createProduct = async (req, res) => {
   };
 
 
+  const updateProductDetails = async (req, res) => {
+    console.log("Datos recibidos en la solicitud de actualización:", req.body);
+    const { id } = req.params;
+    const { titulo, precio, categoria_id, imagen_url } = req.body;
+  
+    // Verificar si el producto existe
+    const productExists = await productModel.getProductById(id);
+    if (!productExists) {
+      return res.status(404).json({ message: "Producto no encontrado ERROR-C" });
+    }
+  
+    // Validar que los campos no estén vacíos
+    if (!titulo || !precio || !categoria_id) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios ERROR-C" });
+    }
+  
+    if (isNaN(categoria_id)) {
+      return res.status(400).json({ message: "El campo categoria_id debe ser un número válido ERROR-C" });
+    }
+  
+    try {
+      // Si no se proporciona imagen_url, se mantiene el valor actual
+      const currentImageUrl = productExists.imagen_url;
+      const updatedImageUrl = imagen_url !== null ? imagen_url : currentImageUrl;
+  
+      const updatedProduct = await productModel.updateProductDetails(id, titulo, precio, categoria_id, updatedImageUrl);
+      res.status(200).json({ message: "Producto actualizado con éxito", updatedProduct });
+    } catch (error) {
+      res.status(500).json({ message: "Ocurrió un error al actualizar el producto ERROR-C", error: error.message });
+    }
+  };
+  
+  
+
 const updateProduct = async (req, res) => {
     const { id } = req.params;
     const { titulo, precio, categoria_id } = req.body;
@@ -121,5 +155,6 @@ module.exports = {
     listProducts,
     getProductsByCategoryAndSearch,
     getProducts,
-    getProductController
+    getProductController,
+    updateProductDetails
  }

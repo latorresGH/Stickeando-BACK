@@ -42,9 +42,22 @@ const getCategories = async () => {
     }
 };
 
+// Actualizar una categoría
+const updateCategory = async (id, nombre) => {
+    const query = `UPDATE categorias SET nombre = $1 WHERE id = $2 RETURNING *;`;
+    const values = [nombre, id];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        throw new Error('Error al actualizar la categoría: ' + error.message);
+    }
+};
 
 module.exports = {
     createCategory,
     deleteCategory,
-    getCategories 
+    getCategories,
+    updateCategory
 }

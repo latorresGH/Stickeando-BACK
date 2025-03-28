@@ -17,6 +17,26 @@ const createCategory = async (req, res) => {
     }
 };
 
+// Actualizar una categoría
+const updateCategory = async (req, res) => {
+    const { id } = req.params;
+    const { nombre } = req.body;
+
+    if (!id || !nombre) {
+        return res.status(400).json({ message: 'ID y nuevo nombre de la categoría son obligatorios' });
+    }
+
+    try {
+        const updatedCategory = await categoryModel.updateCategory(id, nombre);
+        if (!updatedCategory) {
+            return res.status(404).json({ message: 'Categoría no encontrada' });
+        }
+        res.status(200).json({ message: 'Categoría actualizada con éxito', category: updatedCategory });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar la categoría', error: error.message });
+    }
+};
+
 // Eliminar una categoría
 const deleteCategory = async (req, res) => {
     const { id } = req.params;
@@ -49,5 +69,6 @@ const getCategories = async (req, res) => {
 module.exports = { 
     createCategory, 
     deleteCategory,
-    getCategories
+    getCategories,
+    updateCategory
 };

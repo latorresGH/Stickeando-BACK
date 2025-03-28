@@ -25,6 +25,9 @@ router.get('/listar', productController.getProducts);
 
 router.get('/:id', productController.getProductController);
 
+router.put('/update-producto/:id', productController.updateProductDetails);
+
+// ESTO ES DEL CARRITO IRIA EN CARRITOROUTES PERO BUENO
 router.put("/actualizar-producto", async (req, res) => {
     try {
       const { carrito_id, producto_id, cantidad } = req.body;

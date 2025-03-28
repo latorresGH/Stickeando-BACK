@@ -113,6 +113,24 @@ const getProductsByCategoryAndSearch = async (categoryId, searchQuery) => {
   }
 };
 
+const updateProductDetails = async (id, titulo, precio, categoria_id, imagen_url) => {
+  const query = `
+    UPDATE productos
+    SET titulo = $1, precio = $2, categoria_id = $3, imagen_url = $4
+    WHERE id = $5
+    RETURNING *;
+  `;
+  const values = [titulo, precio, categoria_id, imagen_url, id];
+
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0]; // Devuelve el producto actualizado
+  } catch (error) {
+    throw new Error("Error al actualizar el producto: ERROR-M " + error.message);
+  }
+};
+
+
 module.exports = {
   createProduct,
   updateProduct,
@@ -121,4 +139,5 @@ module.exports = {
   listProducts,
   getProductsByCategoryAndSearch,
   getAllProducts,
+  updateProductDetails
 };
