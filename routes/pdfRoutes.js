@@ -42,8 +42,19 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     // Establecer la fuente y tamaño
     doc.fontSize(25).text('Factura de Compra', { align: 'center' });
 
-    // Espacio para la información del usuario
-    doc.fontSize(12).text(`Usuario: ${usuario.nombre}`, { align: 'left' });
+    // Precio Total antes de la información del usuario y productos
+    let total = 0; // Variable para el total
+    carrito.forEach((item) => {
+      total += item.precio * item.cantidad; // Calculando el total
+    });
+
+    // Mostrar el precio total
+    doc.fontSize(14).text(`Precio Total: $${total}`, { align: 'left' });
+    doc.moveDown(1); // Añadir espacio después del precio total
+
+    // Información del usuario
+    doc.fontSize(12).text(`Pedido de Usuario:`, { align: 'left' });
+    doc.text(`Nombre: ${usuario.nombre}`, { align: 'left' });
     doc.text(`Email: ${usuario.correo}`, { align: 'left' });
 
     // Salto de línea para separar la información del carrito
@@ -52,21 +63,11 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     // Título para los productos
     doc.text('Productos comprados:', { align: 'left' });
 
-    // Establecer la posición inicial para el listado de productos
-    let yPos = doc.y + 10; // El valor actual de y será el punto de inicio para los productos
-
-    // Ajuste de precio antes de los productos
-    doc.text('Precio Total:', { align: 'left' });
-    let total = 0; // Variable para el total
-    carrito.forEach((item, index) => {
+    // Listado de productos
+    carrito.forEach((item) => {
       const lineText = `${item.titulo} - $${item.precio} x ${item.cantidad}`;
       doc.text(lineText, { continued: true }).text(` $${item.precio * item.cantidad}`);
-      total += item.precio * item.cantidad; // Calculando el total
     });
-
-    // Salto de línea antes de la sección del precio total
-    doc.moveDown(1);
-    doc.text(`Precio Total: $${total}`, { align: 'left' });
 
     // Finaliza el documento
     doc.end();
@@ -81,6 +82,7 @@ router.post('/generarPDF', upload.single('file'), (req, res) => {
     res.status(500).json({ error: 'Error generando PDF' });
   }
 });
+
 
 
 module.exports = router;
