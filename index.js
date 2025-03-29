@@ -14,7 +14,6 @@ const imgprofileRoutes = require('./routes/imgprofileRoutes'); // Importar las r
 const imgProductRoutes = require('./routes/imgProductRoutes'); // Importar las rutas de imágenes de productos
 const cookieParser = require('cookie-parser');
 const backgroundRoutes = require("./routes/backgroundRoutes");
-const pdfRoutes = require("./routes/pdfRoutes");
 //Configuraciones de la variable de entorno env.
 dotenv.config();
 
