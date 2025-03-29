@@ -9,7 +9,7 @@ router.post('/create', carritoController.createCarrito);
 router.get("/carrito/:usuario_id", carritoController.getCarrito);
 
 // Eliminar un carrito
-router.delete('/:id', carritoController.deleteCarrito);
+router.delete('/carrito/:id', carritoController.deleteCarrito);
 
 
 
