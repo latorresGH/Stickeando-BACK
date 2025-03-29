@@ -1,21 +1,91 @@
-// routes/ordenesRoutes.js
 const express = require('express');
 const router = express.Router();
-const ordenesController = require('../controllers/ordenesController');
+const db = require('../db');
+const { authMiddleware, adminMiddleware } = require('../middlewares/auth');
 
-// Crear una nueva orden
-router.post('/create', ordenesController.createOrden);
+// Crear una orden
+router.post('/', authMiddleware, async (req, res) => {
+    try {
+        const { usuario_id, productos, total } = req.body;
+        
+        if (!productos || productos.length === 0) {
+            return res.status(400).json({ error: 'La orden debe contener productos.' });
+        }
 
-// Obtener todas las órdenes de un usuario
-router.get('/:usuario_id', ordenesController.getOrdenesByUsuario);
+        // Insertar la orden
+        const ordenResult = await db.query(
+            'INSERT INTO ordenes (usuario_id, total) VALUES ($1, $2) RETURNING id',
+            [usuario_id, total]
+        );
+        const orden_id = ordenResult.rows[0].id;
 
-// Agregar productos a la orden
-router.post('/productos/add', ordenesController.addProductoToOrden);
+        // Insertar los productos en la orden
+        const ordenProductosQuery = `
+            INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio) VALUES
+            ${productos.map((_, i) => `($1, $${i * 3 + 2}, $${i * 3 + 3}, $${i * 3 + 4})`).join(', ')}
+        `;
 
-// Verificar los productos en una orden
-router.get('/productos/:orden_id', ordenesController.getProductosByOrdenId);
+        const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
+        await db.query(ordenProductosQuery, [orden_id, ...ordenProductosValues]);
 
-// Eliminar un producto de la orden
-router.delete('/productos/:id', ordenesController.removeProductoFromOrden);
+        res.status(201).json({ mensaje: 'Orden creada con éxito', orden_id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear la orden' });
+    }
+});
+
+// Obtener todas las órdenes (solo admin)
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const ordenes = await db.query(
+            'SELECT * FROM ordenes ORDER BY creado_en DESC'
+        );
+        res.json(ordenes.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener las órdenes' });
+    }
+});
+
+// Obtener una orden por ID (solo admin)
+router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const orden = await db.query(
+            'SELECT * FROM ordenes WHERE id = $1',
+            [id]
+        );
+
+        if (orden.rows.length === 0) {
+            return res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        const productos = await db.query(
+            'SELECT op.producto_id, p.titulo, op.cantidad, op.precio FROM ordenes_productos op JOIN productos p ON op.producto_id = p.id WHERE op.orden_id = $1',
+            [id]
+        );
+
+        res.json({ ...orden.rows[0], productos: productos.rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener la orden' });
+    }
+});
+
+// Marcar orden como realizada
+router.put('/:id/realizar', authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query(
+            'UPDATE ordenes SET estado = $1 WHERE id = $2',
+            ['realizado', id]
+        );
+        res.json({ mensaje: 'Orden marcada como realizada' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar la orden' });
+    }
+});
 
 module.exports = router;

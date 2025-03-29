@@ -59,15 +59,7 @@ app.use('/api', imgprofileRoutes); // Rutas de imágenes de perfil
 app.use('/api', imgProductRoutes); // Rutas de imágenes de perfil
 app.use("/api", backgroundRoutes);
 app.use('/uploads', express.static('uploads'));
-app.use("/api", pdfRoutes); // Aquí agregas las rutas de PDFs
-// setInterval(async () => {
-//   try {
-//       const result = await pool.query('SELECT * FROM categorias'); // Consulta de prueba
-//       console.log('Consulta ejecutada:', result.rows[0]);
-//   } catch (err) {
-//       console.error('Error en la consulta:', err);
-//   }
-// }, 5 * 60 * 1000); 
+
 
 //Levantar servidor
 app.listen(PORT, () => {  // <-- usamos un listen para escuchar/accionar recibiendo el puerto(PORT) y retornamos un console.log con los datos donde se este ejecutando.
