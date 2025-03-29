@@ -49,6 +49,8 @@ const deleteCarrito = async (req, res) => {
     const { id } = req.params;
 
     try {
+        await pool.query("DELETE FROM carrito_productos WHERE carrito_id = $1", [id]);
+
         const result = await carritoModel.deleteCarrito(id);
         if (result) {
             res.json({ message: "Carrito eliminado exitosamente" });
