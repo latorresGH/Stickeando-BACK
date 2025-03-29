@@ -42,7 +42,7 @@ const getCarritoByUserId = async (usuario_id) => {
 // Eliminar un carrito
 const deleteCarrito = async (id) => {
     const result = await pool.query(
-        "DELETE FROM carritos WHERE id = $1",
+        "DELETE FROM carrito_productos WHERE id = $1",
         [id]
     );
     return result.rowCount > 0;
