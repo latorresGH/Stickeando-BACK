@@ -15,19 +15,23 @@ router.post('/', authenticate, async (req, res) => {
 
         // Insertar la orden
         const ordenResult = await db.query(
-            'INSERT INTO ordenes (usuario_id, total) VALUES ($1, $2) RETURNING id',
-            [usuario_id, total]
+            'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
+            [usuario_id, total, 'pendiente']  // Asumiendo que el estado es 'pendiente'
         );
         const orden_id = ordenResult.rows[0].id;
 
-        // Insertar los productos en la orden
+        // Crear los valores para insertar los productos
+        const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
+
+        // Generar la consulta de inserción dinámica para los productos
         const ordenProductosQuery = `
-            INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio) VALUES
-            ${productos.map((_, i) => `($1, $${i * 3 + 2}, $${i * 3 + 3}, $${i * 3 + 4})`).join(', ')}
+            INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
+            VALUES
+            ${productos.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(', ')}
         `;
 
-        const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
-        await db.query(ordenProductosQuery, [orden_id, ...ordenProductosValues]);
+        // Ejecutar la consulta para insertar los productos
+        await db.query(ordenProductosQuery, ordenProductosValues);
 
         res.status(201).json({ mensaje: 'Orden creada con éxito', orden_id });
     } catch (error) {
@@ -35,6 +39,7 @@ router.post('/', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Error al crear la orden' });
     }
 });
+
 
 // Obtener todas las órdenes (solo admin)
 router.get('/', authenticate, isAdmin, async (req, res) => {
