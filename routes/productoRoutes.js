@@ -27,26 +27,6 @@ router.get('/:id', productController.getProductController);
 
 router.put('/update-producto/:id', productController.updateProductDetails);
 
-// ESTO ES DEL CARRITO IRIA EN CARRITOROUTES PERO BUENO
-router.put("/actualizar-producto", async (req, res) => {
-    try {
-      const { carrito_id, producto_id, cantidad } = req.body;
-  
-      const resultado = await pool.query(
-        "UPDATE carrito_productos SET cantidad = $1 WHERE carrito_id = $2 AND producto_id = $3 RETURNING *",
-        [cantidad, carrito_id, producto_id]
-      );
-  
-      if (resultado.rowCount === 0) {
-        return res.status(404).json({ mensaje: "Producto no encontrado en el carrito" });
-      }
-  
-      res.json({ mensaje: "Cantidad actualizada", producto: resultado.rows[0] });
-    } catch (error) {
-      console.error("Error al actualizar producto en carrito:", error);
-      res.status(500).json({ mensaje: "Error interno del servidor" });
-    }
-  });
   
 
 module.exports = router;

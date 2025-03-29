@@ -1,7 +1,7 @@
 const carritoProductosModel = require('../models/carritoProductosModel');
 const pool = require('../config/database/db')
 
-// Lógica en el backend para agregar un producto al carrito
+// Lógica en el backend para agregar o actualizar un producto al carrito
 const addProductoToCarrito = async (req, res) => {
     const { carrito_id, producto_id, cantidad } = req.body;
 
@@ -10,12 +10,14 @@ const addProductoToCarrito = async (req, res) => {
             return res.status(400).json({ message: 'Datos inválidos' });
         }
 
+        // Verificar si el producto ya existe en el carrito
         const queryCheck = `
             SELECT id, cantidad FROM carrito_productos WHERE carrito_id = $1 AND producto_id = $2;
         `;
         const existingProduct = await pool.query(queryCheck, [carrito_id, producto_id]);
 
         if (existingProduct.rowCount > 0) {
+            // Si el producto existe, actualizamos la cantidad
             const newCantidad = existingProduct.rows[0].cantidad + cantidad;
             const queryUpdate = `
                 UPDATE carrito_productos SET cantidad = $1 WHERE id = $2 RETURNING *;
@@ -23,6 +25,7 @@ const addProductoToCarrito = async (req, res) => {
             const result = await pool.query(queryUpdate, [newCantidad, existingProduct.rows[0].id]);
             return res.status(201).json({ message: 'Producto actualizado en el carrito', producto: result.rows[0] });
         } else {
+            // Si el producto no está en el carrito, lo agregamos
             const queryInsert = `
                 INSERT INTO carrito_productos (carrito_id, producto_id, cantidad)
                 VALUES ($1, $2, $3) RETURNING *;
@@ -31,10 +34,11 @@ const addProductoToCarrito = async (req, res) => {
             return res.status(201).json({ message: 'Producto agregado al carrito', producto: result.rows[0] });
         }
     } catch (error) {
-        console.error('Error detallado:', error);  // Agrega más detalles al error
-        res.status(500).json({ message: 'Error al agregar producto al carrito', error: error.message });
+        console.error('Error al agregar o actualizar producto en el carrito', error);
+        res.status(500).json({ message: 'Error al agregar o actualizar producto', error: error.message });
     }
 };
+
 
 
 
