@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
-const { authMiddleware, adminMiddleware } = require('../middlewares/auth');
+const db = require('../config/database/db')
+const authenticate = require('../middleware/authenticate');
+const isAdmin = require('../middleware/isAdmin')
 
 // Crear una orden
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     try {
         const { usuario_id, productos, total } = req.body;
         
@@ -36,7 +37,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Obtener todas las órdenes (solo admin)
-router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/', authenticate, isAdmin, async (req, res) => {
     try {
         const ordenes = await db.query(
             'SELECT * FROM ordenes ORDER BY creado_en DESC'
@@ -49,7 +50,7 @@ router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Obtener una orden por ID (solo admin)
-router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.get('/:id', authenticate, isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const orden = await db.query(
@@ -74,7 +75,7 @@ router.get('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Marcar orden como realizada
-router.put('/:id/realizar', authMiddleware, adminMiddleware, async (req, res) => {
+router.put('/:id/realizar', authenticate, isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         await db.query(
