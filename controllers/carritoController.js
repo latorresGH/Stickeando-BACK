@@ -1,5 +1,6 @@
 const carritoModel = require('../models/carritoModel');
 const carritoProductosModel = require('../models/carritoProductosModel');
+const pool = require('../config/database/db'); // Importar la conexión a la base de datos que creamos el archivo db.js
 
 // Crear carrito (Solo se usa cuando se registra un usuario)
 const createCarrito = async (usuario_id) => {
