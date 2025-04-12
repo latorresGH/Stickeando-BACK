@@ -8,39 +8,56 @@ const isAdmin = require('../middleware/isAdmin')
 // Añadir esta ruta al archivo de rutas de órdenes
 
 // Ruta específica para crear órdenes sin autenticación
-router.post('/anonimas', async (req, res) => {
+app.post('/ordenes', async (req, res) => {
+    const { productos, total } = req.body;
+    const usuarioId = req.usuario?.id || null; // según cómo obtengas el usuario
+  
+    const client = await pool.connect();
+  
     try {
-        const { productos, total } = req.body;
-        
-        if (!productos || productos.length === 0) {
-            return res.status(400).json({ error: 'La orden debe contener productos.' });
-        }
-
-        // Siempre asignar NULL para usuario_id en órdenes anónimas
-        const finalUserId = null;
-
-        // Insertar la orden
-        const ordenResult = await db.query(
-            'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
-            [finalUserId, total, 'pendiente']
+      await client.query('BEGIN');
+  
+      // Crear orden
+      const ordenResult = await client.query(
+        `INSERT INTO ordenes (usuario_id, total, estado, creado_en)
+         VALUES ($1, $2, $3, NOW())
+         RETURNING id`,
+        [usuarioId, parseFloat(total), 'pendiente']
+      );
+  
+      const ordenId = ordenResult.rows[0].id;
+  
+      // Insertar cada producto en ordenes_productos
+      for (const producto of productos) {
+        const { producto_id, cantidad, precio } = producto;
+  
+        await client.query(
+          `INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
+           VALUES ($1, $2, $3, $4)`,
+          [
+            ordenId,
+            producto_id,
+            cantidad,
+            parseFloat(precio), // 👈 conversión segura
+          ]
         );
-        const orden_id = ordenResult.rows[0].id;
-
-        // Insertar los productos (mismo código que la otra ruta)
-        const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
-        const ordenProductosQuery = `
-            INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
-            VALUES
-            ${productos.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(', ')}
-        `;
-        await db.query(ordenProductosQuery, ordenProductosValues);
-
-        res.status(201).json({ mensaje: 'Orden anónima creada con éxito', orden_id });
+      }
+  
+      await client.query('COMMIT');
+  
+      res.status(201).json({
+        mensaje: 'Orden creada correctamente',
+        ordenId,
+      });
     } catch (error) {
-        console.error('Error creando orden anónima:', error); // <-- Agregalo así
-        res.status(500).json({ error: 'Error al crear la orden anónima' });
+      await client.query('ROLLBACK');
+      console.error('Error al crear orden:', error);
+      res.status(500).json({ error: 'Error al crear la orden' });
+    } finally {
+      client.release();
     }
-});
+  });
+  
 
 router.post('/', authenticate, async (req, res) => {
     try {
