@@ -95,7 +95,7 @@ router.put('/:id/realizar', authenticate, isAdmin, async (req, res) => {
 });
 
 // Eliminar una orden por ID (solo admin)
-router.delete('/:id', authenticate, isAdmin, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
