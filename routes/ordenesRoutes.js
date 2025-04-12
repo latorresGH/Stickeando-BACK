@@ -12,7 +12,7 @@ router.post('/anonimas', async (req, res) => {
     const { productos, total } = req.body;
     const usuarioId = req.usuario?.id || null; // según cómo obtengas el usuario
   
-    const client = await pool.connect();
+    const client = await db.connect();
   
     try {
       await client.query('BEGIN');
