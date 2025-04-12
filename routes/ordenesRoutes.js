@@ -94,4 +94,33 @@ router.put('/:id/realizar', authenticate, isAdmin, async (req, res) => {
     }
 });
 
+// Eliminar una orden por ID (solo admin)
+router.delete('/:id', authenticate, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Primero eliminar los productos relacionados a la orden
+        await db.query(
+            'DELETE FROM ordenes_productos WHERE orden_id = $1',
+            [id]
+        );
+
+        // Luego eliminar la orden
+        const result = await db.query(
+            'DELETE FROM ordenes WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Orden no encontrada' });
+        }
+
+        res.json({ mensaje: 'Orden eliminada con éxito' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar la orden' });
+    }
+});
+
+
 module.exports = router;
