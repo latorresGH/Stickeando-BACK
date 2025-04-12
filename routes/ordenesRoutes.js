@@ -5,7 +5,7 @@ const authenticate = require('../middleware/authenticate');
 const isAdmin = require('../middleware/isAdmin')
 
 // Crear una orden
-router.post('/', authenticate, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const { usuario_id, productos, total } = req.body;
         
@@ -13,10 +13,13 @@ router.post('/', authenticate, async (req, res) => {
             return res.status(400).json({ error: 'La orden debe contener productos.' });
         }
 
+        // Si el usuario no está logueado, asignar NULL o un valor predeterminado
+        const finalUserId = usuario_id === 0 ? null : usuario_id; // Usar null o 0 si no está logueado
+
         // Insertar la orden
         const ordenResult = await db.query(
             'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
-            [usuario_id, total, 'pendiente']  // Asumiendo que el estado es 'pendiente'
+            [finalUserId, total, 'pendiente']
         );
         const orden_id = ordenResult.rows[0].id;
 
@@ -39,6 +42,41 @@ router.post('/', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Error al crear la orden' });
     }
 });
+
+// router.post('/', authenticate, async (req, res) => {
+//     try {
+//         const { usuario_id, productos, total } = req.body;
+        
+//         if (!productos || productos.length === 0) {
+//             return res.status(400).json({ error: 'La orden debe contener productos.' });
+//         }
+
+//         // Insertar la orden
+//         const ordenResult = await db.query(
+//             'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
+//             [usuario_id, total, 'pendiente']  // Asumiendo que el estado es 'pendiente'
+//         );
+//         const orden_id = ordenResult.rows[0].id;
+
+//         // Crear los valores para insertar los productos
+//         const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
+
+//         // Generar la consulta de inserción dinámica para los productos
+//         const ordenProductosQuery = `
+//             INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
+//             VALUES
+//             ${productos.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(', ')}
+//         `;
+
+//         // Ejecutar la consulta para insertar los productos
+//         await db.query(ordenProductosQuery, ordenProductosValues);
+
+//         res.status(201).json({ mensaje: 'Orden creada con éxito', orden_id });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Error al crear la orden' });
+//     }
+// });
 
 
 // Obtener todas las órdenes (solo admin)
