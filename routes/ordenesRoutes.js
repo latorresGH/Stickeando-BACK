@@ -10,7 +10,7 @@ const isAdmin = require('../middleware/isAdmin')
 // Ruta específica para crear órdenes sin autenticación
 router.post('/anonimas', async (req, res) => {
     const { productos, total } = req.body;
-    const usuarioId = req.usuario?.id || null; // según cómo obtengas el usuario
+    const usuarioId = req.usuario?.id || null;
   
     const client = await db.connect();
   
@@ -27,9 +27,19 @@ router.post('/anonimas', async (req, res) => {
   
       const ordenId = ordenResult.rows[0].id;
   
-      // Insertar cada producto en ordenes_productos
+      // Validación extra
+      if (!productos || !Array.isArray(productos) || productos.length === 0) {
+        throw new Error('No se enviaron productos válidos.');
+      }
+  
+      // Insertar productos
       for (const producto of productos) {
         const { producto_id, cantidad, precio } = producto;
+  
+        // Validación básica para evitar errores
+        if (!producto_id || !cantidad || isNaN(parseFloat(precio))) {
+          throw new Error('Producto con datos inválidos: ' + JSON.stringify(producto));
+        }
   
         await client.query(
           `INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
@@ -38,7 +48,7 @@ router.post('/anonimas', async (req, res) => {
             ordenId,
             producto_id,
             cantidad,
-            parseFloat(precio), // 👈 conversión segura
+            parseFloat(precio),
           ]
         );
       }
@@ -49,15 +59,15 @@ router.post('/anonimas', async (req, res) => {
         mensaje: 'Orden creada correctamente',
         ordenId,
       });
+  
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error('Error al crear orden:', error);
+      console.error('Error al crear orden:', error.message);
       res.status(500).json({ error: 'Error al crear la orden' });
     } finally {
       client.release();
     }
   });
-  
 
 router.post('/', authenticate, async (req, res) => {
     try {
