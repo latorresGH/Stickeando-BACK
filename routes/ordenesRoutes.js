@@ -1,12 +1,48 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database/db')
-// Eliminamos el middleware de autenticación de esta ruta
-// const authenticate = require('../middleware/authenticate');
-// const isAdmin = require('../middleware/isAdmin')
+const authenticate = require('../middleware/authenticate');
+const isAdmin = require('../middleware/isAdmin')
 
-// Crear una orden
-router.post('/', async (req, res) => {
+
+// Añadir esta ruta al archivo de rutas de órdenes
+
+// Ruta específica para crear órdenes sin autenticación
+router.post('/anonimas', async (req, res) => {
+    try {
+        const { productos, total } = req.body;
+        
+        if (!productos || productos.length === 0) {
+            return res.status(400).json({ error: 'La orden debe contener productos.' });
+        }
+
+        // Siempre asignar NULL para usuario_id en órdenes anónimas
+        const finalUserId = null;
+
+        // Insertar la orden
+        const ordenResult = await db.query(
+            'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
+            [finalUserId, total, 'pendiente']
+        );
+        const orden_id = ordenResult.rows[0].id;
+
+        // Insertar los productos (mismo código que la otra ruta)
+        const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
+        const ordenProductosQuery = `
+            INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
+            VALUES
+            ${productos.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(', ')}
+        `;
+        await db.query(ordenProductosQuery, ordenProductosValues);
+
+        res.status(201).json({ mensaje: 'Orden anónima creada con éxito', orden_id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear la orden anónima' });
+    }
+});
+
+router.post('/', authenticate, async (req, res) => {
     try {
         const { usuario_id, productos, total } = req.body;
         
@@ -14,13 +50,10 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: 'La orden debe contener productos.' });
         }
 
-        // Si el usuario no está logueado, asignar NULL o un valor predeterminado
-        const finalUserId = usuario_id === 0 ? null : usuario_id; // Usar null si no está logueado
-
         // Insertar la orden
         const ordenResult = await db.query(
             'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
-            [finalUserId, total, 'pendiente']
+            [usuario_id, total, 'pendiente']  // Asumiendo que el estado es 'pendiente'
         );
         const orden_id = ordenResult.rows[0].id;
 
@@ -43,42 +76,6 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Error al crear la orden' });
     }
 });
-
-
-// router.post('/', authenticate, async (req, res) => {
-//     try {
-//         const { usuario_id, productos, total } = req.body;
-        
-//         if (!productos || productos.length === 0) {
-//             return res.status(400).json({ error: 'La orden debe contener productos.' });
-//         }
-
-//         // Insertar la orden
-//         const ordenResult = await db.query(
-//             'INSERT INTO ordenes (usuario_id, total, estado) VALUES ($1, $2, $3) RETURNING id',
-//             [usuario_id, total, 'pendiente']  // Asumiendo que el estado es 'pendiente'
-//         );
-//         const orden_id = ordenResult.rows[0].id;
-
-//         // Crear los valores para insertar los productos
-//         const ordenProductosValues = productos.flatMap(p => [orden_id, p.producto_id, p.cantidad, p.precio]);
-
-//         // Generar la consulta de inserción dinámica para los productos
-//         const ordenProductosQuery = `
-//             INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
-//             VALUES
-//             ${productos.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(', ')}
-//         `;
-
-//         // Ejecutar la consulta para insertar los productos
-//         await db.query(ordenProductosQuery, ordenProductosValues);
-
-//         res.status(201).json({ mensaje: 'Orden creada con éxito', orden_id });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Error al crear la orden' });
-//     }
-// });
 
 
 // Obtener todas las órdenes (solo admin)
