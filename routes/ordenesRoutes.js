@@ -8,7 +8,7 @@ const isAdmin = require('../middleware/isAdmin')
 // Añadir esta ruta al archivo de rutas de órdenes
 
 // Ruta específica para crear órdenes sin autenticación
-router.post('/ordenes', async (req, res) => {
+router.post('/anonimas', async (req, res) => {
     const { productos, total } = req.body;
     const usuarioId = req.usuario?.id || null; // según cómo obtengas el usuario
   
