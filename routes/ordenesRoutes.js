@@ -37,7 +37,7 @@ router.post('/anonimas', async (req, res) => {
 
         res.status(201).json({ mensaje: 'Orden anónima creada con éxito', orden_id });
     } catch (error) {
-        console.error(error);
+        console.error('Error creando orden anónima:', error); // <-- Agregalo así
         res.status(500).json({ error: 'Error al crear la orden anónima' });
     }
 });
