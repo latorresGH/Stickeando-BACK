@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database/db')
-const authenticate = require('../middleware/authenticate');
-const isAdmin = require('../middleware/isAdmin')
+// Eliminamos el middleware de autenticación de esta ruta
+// const authenticate = require('../middleware/authenticate');
+// const isAdmin = require('../middleware/isAdmin')
 
 // Crear una orden
 router.post('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/', async (req, res) => {
         }
 
         // Si el usuario no está logueado, asignar NULL o un valor predeterminado
-        const finalUserId = usuario_id === 0 ? null : usuario_id; // Usar null o 0 si no está logueado
+        const finalUserId = usuario_id === 0 ? null : usuario_id; // Usar null si no está logueado
 
         // Insertar la orden
         const ordenResult = await db.query(
@@ -42,6 +43,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Error al crear la orden' });
     }
 });
+
 
 // router.post('/', authenticate, async (req, res) => {
 //     try {
