@@ -25,7 +25,7 @@ router.post('/anonimas', async (req, res) => {
         [usuarioId, parseFloat(total), 'pendiente']
       );
   
-      const ordenId = ordenResult.rows[0].id;
+      const orden_id = ordenResult.rows[0].id;
   
       // Validación extra
       if (!productos || !Array.isArray(productos) || productos.length === 0) {
@@ -45,7 +45,7 @@ router.post('/anonimas', async (req, res) => {
           `INSERT INTO ordenes_productos (orden_id, producto_id, cantidad, precio)
            VALUES ($1, $2, $3, $4)`,
           [
-            ordenId,
+            orden_id,
             producto_id,
             cantidad,
             parseFloat(precio),
@@ -57,7 +57,7 @@ router.post('/anonimas', async (req, res) => {
   
       res.status(201).json({
         mensaje: 'Orden creada correctamente',
-        ordenId,
+        orden_id,
       });
   
     } catch (error) {
